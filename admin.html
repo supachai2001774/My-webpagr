@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ ระบบผู้ดูแล • ไซเบอร์แพนเนล ⚡</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyber-bg: #03010b; /* Deep Dark */
+            --cyber-dark: #0f091a; /* Darker Surface */
+            --cyber-darker: #070314; /* Deepest Background */
+            --cyber-cyan: #00e5ff; /* Stronger Neon Blue */
+            --cyber-pink: #ff1aff; /* Vibrant Neon Pink */
+            --cyber-green: #00ff88; /* Bright Neon Green */
+            --cyber-purple: #9933ff; /* Deep Purple */
+            --cyber-orange: #ff9933;
+            --cyber-white: #ffffff;
+            --cyber-gray: #b3b3b3;
+            --cyber-light-gray: #e6e6e6;
+            --scanline-size: 2px;
+            --glitch-intensity: 2px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--cyber-darker);
+            color: var(--cyber-white);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* SCANLINES EFFECT (Fine-tuned for deep dark bg) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent var(--scanline-size),
+                rgba(0, 229, 255, 0.04) var(--scanline-size),
+                rgba(0, 229, 255, 0.04) calc(var(--scanline-size) * 2)
+            );
+            pointer-events: none;
+            z-index: 1000;
+            animation: scanlines 0.1s linear infinite;
+        }
+
+        /* ANIMATIONS */
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(var(--scanline-size)); }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 1px); filter: brightness(1.3); }
+            40% { transform: translate(-1px, -2px); filter: brightness(0.9); }
+            60% { transform: translate(3px, 2px); filter: brightness(1.2); }
+            80% { transform: translate(2px, -1px); filter: brightness(1.1); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes neon-glow {
+            0%, 100% { text-shadow: 0 0 5px var(--cyber-cyan), 0 0 15px var(--cyber-pink); }
+            50% { text-shadow: 0 0 20px var(--cyber-cyan), 0 0 35px var(--cyber-pink), 0 0 50px var(--cyber-green); }
+        }
+
+        @keyframes cyber-pulse {
+            0%, 100% { box-shadow: 0 0 5px var(--cyber-cyan), 0 0 10px rgba(0, 229, 255, 0.5); }
+            50% { box-shadow: 0 0 20px var(--cyber-cyan), 0 0 40px rgba(0, 229, 255, 0.8); }
+        }
+
+        @keyframes holo-shift {
+            0% { transform: translateX(0) skew(0deg); }
+            25% { transform: translateX(1px) skew(0.1deg); }
+            75% { transform: translateX(-1px) skew(-0.1deg); }
+            100% { transform: translateX(0) skew(0deg); }
+        }
+        
+        @keyframes holo-fade {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        /* === ADMIN LOGIN === */
+        .admin-login {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 15%, var(--cyber-purple) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, var(--cyber-pink) 0%, transparent 40%),
+                var(--cyber-darker);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .admin-login.hidden {
+            display: none;
+        }
+
+        .login-box {
+            background: linear-gradient(145deg, 
+                rgba(0, 229, 255, 0.15), /* Brighter Gradient */
+                rgba(255, 26, 255, 0.15),
+                rgba(0, 255, 136, 0.15));
+            backdrop-filter: blur(20px) brightness(1.2);
+            border: 2px solid;
+            border-image: linear-gradient(45deg, var(--cyber-cyan), var(--cyber-pink), var(--cyber-green)) 1;
+            padding: 50px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            /* Aggressive Clip-Path */
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%, 0 20%);
+            animation: holo-shift 3s ease-in-out infinite;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--cyber-cyan), var(--cyber-pink), var(--cyber-green));
+            z-index: -1;
+            clip-path: inherit;
+            animation: cyber-pulse 2s ease-in-out infinite;
+        }
+
+        .admin-crown {
+            font-family: 'Orbitron', monospace;
+            font-size: 70px; /* Larger icon */
+            margin-bottom: 25px;
+            background: linear-gradient(45deg, var(--cyber-cyan), var(--cyber-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: neon-glow 1.5s ease-in-out infinite alternate, glitch 4s infinite; /* Faster neon pulse */
+            filter: drop-shadow(0 0 20px var(--cyber-cyan)); /* Stronger shadow */
+        }
+
+        .login-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2em;
+            font-weight: 900;
+            color: var(--cyber-white);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            animation: glitch 6s infinite;
+        }
+
+        .login-subtitle {
+            color: var(--cyber-gray);
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .security-notice {
+            background: linear-gradient(45deg, 
+                rgba(255, 26, 255, 0.3),
+                rgba(153, 51, 255, 0.3)
+            );
+            border: 1px solid var(--cyber-pink);
+            clip-path: polygon(10px 0, 100% 0, 90% 100%, 0 100%); /* Sharper security badge */
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            color: var(--cyber-white);
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .security-notice::before {
+            content: '⚠ จำเป็นต้องมีสิทธิ์การเข้าถึงระดับสูง ⚠';
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--cyber-pink);
+            color: var(--cyber-bg);
+            padding: 3px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 100%, 0 100%);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--cyber-cyan);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--cyber-dark);
+            color: var(--cyber-white);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            /* Angular input shape */
+            clip-path: polygon(5% 0, 100% 0, 100% 75%, 95% 100%, 0 100%, 0 25%);
+        }
+
+        .form-input::placeholder {
+            color: var(--cyber-gray);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--cyber-cyan);
+            box-shadow: 
+                0 0 30px rgba(0, 229, 255, 0.7),
+                inset 0 0 25px rgba(0, 229, 255, 0.2);
+            animation: cyber-pulse 1s ease-in-out infinite alternate;
+        }
+
+        .admin-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(45deg, var(--cyber-cyan), var(--cyber-green));
+            color: var(--cyber-darker); /* Darker text for contrast */
+            border: none;
+            font-family: 'Orbitron', monospace;
+            font-size: 16px; /* Larger text */
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            /* Aggressive button clip-path */
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .admin-btn:hover::before {
+            left: 100%;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 25px rgba(0, 229, 255, 0.6),
+                0 0 40px rgba(0, 229, 255, 0.4);
+            filter: brightness(1.3);
+        }
+
+        .login-alert {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+        }
+
+        .login-alert.show {
+            display: block;
+            animation: glitch 0.5s ease-in-out;
+        }
+
+        .login-alert.error {
+            background: linear-gradient(45deg, rgba(255, 26, 255, 0.3), rgba(255, 153, 51, 0.3));
+            color: var(--cyber-pink);
+            border: 1px solid var(--cyber-pink);
+            clip-path: polygon(5px 0, 100% 0, 95% 100%, 0 100%);
+        }
+
+        .login-alert.success {
+            background: linear-gradient(45deg, rgba(0, 255, 136, 0.3), rgba(0, 229, 255, 0.3));
+            color: var(--cyber-green);
+            border: 1px solid var(--cyber-green);
+            clip-path: polygon(5px 0, 100% 0, 95% 100%, 0 100%);
+        }
+
+        /* === ADMIN DASHBOARD === */
+        .admin-container {
+            display: none;
+            grid-template-columns: 350px 1fr; /* Wider Sidebar */
+            min-height: 100vh;
+        }
+
+        .admin-container.authenticated {
+            display: grid;
+        }
+
+        .sidebar {
+            background: var(--cyber-dark);
+            border-right: 2px solid var(--cyber-pink); /* Pink border for contrast */
+            position: relative;
+            overflow: hidden;
+            /* Asymmetrical sidebar shape */
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 0 100%); 
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 50px,
+                rgba(255, 26, 255, 0.05) 50px, /* Pink vertical lines */
+                rgba(255, 26, 255, 0.05) 52px
+            );
+            pointer-events: none;
+        }
+
+        .sidebar-header {
+            padding: 40px 30px 30px; /* Larger header area */
+            border-bottom: 2px solid var(--cyber-cyan);
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            background: rgba(0, 229, 255, 0.1); /* Subtle background */
+            /* Sharper header cut */
+            clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+        }
+
+        .sidebar-header .crown {
+            font-family: 'Orbitron', monospace;
+            font-size: 50px;
+            background: linear-gradient(45deg, var(--cyber-cyan), var(--cyber-pink), var(--cyber-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            animation: neon-glow 2s ease-in-out infinite alternate;
+        }
+
+        .sidebar-header h2 {
+            color: var(--cyber-white);
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2em;
+            font-weight: 900;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .sidebar-header p {
+            color: var(--cyber-gray);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 30px; /* Larger padding */
+            color: var(--cyber-gray);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 13px;
+            position: relative;
+            /* Distinctive trapezoid shape */
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 0 100%);
+            margin-bottom: 5px;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 6px; /* Wider active bar */
+            height: 100%;
+            background: linear-gradient(45deg, var(--cyber-cyan), var(--cyber-pink));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            clip-path: polygon(0 0, 100% 10%, 100% 90%, 0 100%);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: linear-gradient(90deg, 
+                rgba(0, 229, 255, 0.3),
+                rgba(255, 26, 255, 0.05));
+            color: var(--cyber-white);
+            filter: brightness(1.2);
+            transform: none; /* No movement on hover */
+        }
+
+        .nav-link:hover::before, .nav-link.active::before {
+            transform: scaleY(1);
+        }
+
+        .main-content {
+            padding: 40px; /* Larger padding */
+            background: var(--cyber-darker);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .header-bar {
+            background: var(--cyber-dark);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--cyber-cyan);
+            /* Aggressive header shape */
+            clip-path: polygon(0 0, 100% 0, 100% 80%, 95% 100%, 0 100%, 5% 50%);
+            padding: 25px 35px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            animation: holo-fade 5s infinite alternate; /* Fading effect */
+        }
+
+        .header-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent,
+                var(--cyber-cyan),
+                transparent);
+            animation: cyber-pulse 2s ease-in-out infinite;
+        }
+
+        .page-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2em;
+            font-weight: 900;
+            color: var(--cyber-cyan);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); /* Title glow */
+        }
+
+        .page-description {
+            color: var(--cyber-gray);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .cyber-btn {
+            padding: 10px 18px;
+            background: var(--cyber-darker);
+            border: 1px solid var(--cyber-cyan);
+            color: var(--cyber-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cyber-btn:hover {
+            background: linear-gradient(45deg, var(--cyber-cyan), var(--cyber-green));
+            color: var(--cyber-dark);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .cyber-btn.danger {
+            border-color: var(--cyber-pink);
+            color: var(--cyber-pink);
+        }
+
+        .cyber-btn.danger:hover {
+            background: linear-gradient(45deg, var(--cyber-pink), var(--cyber-orange));
+            color: var(--cyber-dark);
+            box-shadow: 0 0 20px rgba(255, 26, 255, 0.5);
+        }
+        
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--cyber-dark);
+            border: 2px solid var(--cyber-purple); /* Purple border for depth */
+            /* Unique complex clip-path for stats */
+            clip-path: polygon(0 0, 95% 0, 100% 15%, 100% 100%, 5% 100%, 0 85%);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            border-left: 5px solid var(--cyber-cyan); /* Emphasize left edge */
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(0, 229, 255, 0.1),
+                transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.03) rotateZ(-0.5deg);
+            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.4);
+            border-color: var(--cyber-cyan);
+        }
+
+        .stat-icon {
+            font-size: 45px;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, var(--cyber-cyan), var(--cyber-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.8));
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 3em; /* Very large number */
+            font-weight: 900;
+            color: var(--cyber-white);
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px var(--cyber-cyan);
+            animation: glitch 10s infinite;
+        }
+
+        .stat-label {
+            color: var(--cyber-gray);
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* CONTENT SECTIONS */
+        .content-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeInUp 0.5s ease-in-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* TERMINAL-STYLE EFFECTS (More Terminal-like) */
+        .terminal-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--cyber-green);
+            background: var(--cyber-darker);
+            padding: 20px;
+            border: 2px solid var(--cyber-green);
+            margin: 30px 0;
+            position: relative;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            /* Angled top right corner */
+            clip-path: polygon(0 0, 98% 0, 100% 10%, 100% 100%, 0 100%);
+        }
+
+        .terminal-text::before {
+            content: '>> CYBER_ROOT@PANEL: ';
+            color: var(--cyber-cyan);
+            margin-right: 10px;
+        }
+
+        .blinking-cursor::after {
+            content: '█';
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* CYBER FORM */
+        .cyber-form {
+            background: var(--cyber-dark);
+            border: 1px solid var(--cyber-purple);
+            /* Distinctive form shape */
+            clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .cyber-form h3 {
+            border-bottom: 2px dashed var(--cyber-pink);
+            padding-bottom: 10px;
+        }
+
+        .cyber-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .cyber-form .form-label {
+            color: var(--cyber-pink);
+            font-size: 13px;
+        }
+        
+        .cyber-form .form-input, .cyber-form select, .cyber-form textarea {
+            /* Input style within forms */
+            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 20%);
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--cyber-cyan);
+        }
+
+        .cyber-form select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--cyber-dark);
+            border: 1px solid var(--cyber-cyan);
+            color: var(--cyber-white);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            /* Match form clip-path */
+            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 20%);
+        }
+
+        .cyber-form textarea {
+            width: 100%;
+            padding: 15px;
+            background: var(--cyber-dark);
+            border: 1px solid var(--cyber-cyan);
+            color: var(--cyber-white);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 120px;
+            /* Match form clip-path */
+            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 20%);
+        }
+
+        .cyber-form .cyber-btn {
+            /* Custom button clip-path for internal forms */
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            width: auto;
+            padding: 15px 25px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        /* CYBER TABLE (More angular and distinct) */
+        .cyber-table {
+            width: 100%;
+            background: var(--cyber-dark);
+            border: 2px solid var(--cyber-cyan);
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            /* Angled table corners */
+            clip-path: polygon(0 15px, 15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+        }
+
+        .cyber-table thead {
+            background: linear-gradient(90deg, var(--cyber-cyan), var(--cyber-green));
+            filter: brightness(1.3);
+        }
+
+        .cyber-table th {
+            padding: 18px 25px;
+            text-align: left;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--cyber-darker);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cyber-table td {
+            padding: 15px 25px;
+            border-bottom: 1px solid rgba(255, 26, 255, 0.2); /* Pink dividers */
+            color: var(--cyber-light-gray);
+            font-size: 13px;
+        }
+
+        .cyber-table tr:hover td {
+            background: rgba(255, 26, 255, 0.1);
+            color: var(--cyber-light-gray);
+            box-shadow: inset 0 0 5px rgba(255, 26, 255, 0.5);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-badge.active {
+            background: var(--cyber-green);
+            color: var(--cyber-darker);
+        }
+
+        .status-badge.inactive {
+            background: var(--cyber-gray);
+            color: var(--cyber-darker);
+        }
+
+        .status-badge.warning {
+            background: var(--cyber-orange);
+            color: var(--cyber-darker);
+        }
+
+        .status-badge.error {
+            background: var(--cyber-pink);
+            color: var(--cyber-darker);
+        }
+
+        /* ALERT SYSTEM (More aggressive shape) */
+        .alert {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            padding: 15px 20px;
+            color: var(--cyber-white);
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            z-index: 10000;
+            min-width: 350px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            /* Aggressive alert shape */
+            clip-path: polygon(0 0, 90% 0, 100% 20%, 100% 100%, 10% 100%, 0 80%);
+        }
+
+        .alert.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .alert.alert-success {
+            background: linear-gradient(45deg, var(--cyber-green), var(--cyber-cyan));
+            border: 1px solid var(--cyber-green);
+            color: var(--cyber-darker); /* Dark text on bright background */
+        }
+
+        .alert.alert-error {
+            background: linear-gradient(45deg, var(--cyber-pink), var(--cyber-orange));
+            border: 1px solid var(--cyber-pink);
+            color: var(--cyber-white);
+        }
+
+        .alert.alert-info {
+            background: linear-gradient(45deg, var(--cyber-cyan), var(--cyber-purple));
+            border: 1px solid var(--cyber-cyan);
+            color: var(--cyber-darker);
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                clip-path: none;
+                border-right: none;
+            }
+            .nav-menu {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .nav-item {
+                flex: 1 1 45%;
+                margin: 5px;
+            }
+            .nav-link {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); /* Simpler shape for mobile */
+                margin-left: 0;
+                padding: 12px;
+                text-align: center;
+                justify-content: center;
+            }
+            .nav-link::before {
+                display: none;
+            }
+            .header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .login-box {
+                padding: 30px;
+            }
+            .admin-btn {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-login" id="adminLogin">
+        <div class="login-box">
+            <div class="admin-crown">⚡</div>
+            <h1 class="login-title">ระบบผู้ดูแล</h1>
+            <p class="login-subtitle">เทอร์มินัลไซเบอร์แพนเนล</p>
+            
+            <div class="security-notice">
+                จำเป็นต้องมีสิทธิ์การเข้าถึงระดับสูง
+            </div>
+
+            <div class="login-alert" id="loginAlert"></div>
+
+            <div class="form-group">
+                <label class="form-label">ชื่อผู้ใช้</label>
+                <input type="text" class="form-input" id="adminUsername" placeholder="กรอกชื่อผู้ใช้" autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">รหัสผ่าน</label>
+                <input type="password" class="form-input" id="adminPassword" placeholder="กรอกรหัสผ่าน" autocomplete="current-password">
+            </div>
+
+            <button class="admin-btn" onclick="userLogin()">
+                เริ่มการเข้าถึง
+            </button>
+        </div>
+    </div>
+
+    <div class="admin-container" id="adminContainer">
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span class="crown">⚡</span>
+                <h2>ไซเบอร์แพนเนล</h2>
+                <p class="blinking-cursor">ระบบออนไลน์</p>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showSection('dashboard')">
+                        📊 แดชบอร์ด
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('users')">
+                        👥 จัดการผู้ใช้
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('posts')">
+                        📝 จัดการโพสต์
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('analytics')">
+                        📈 วิเคราะห์ข้อมูล
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('content')">
+                        📄 จัดการเนื้อหา
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('security')">
+                        🔒 ระบบความปลอดภัย
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('system')">
+                        ⚙️ การตั้งค่า
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('backup')">
+                        💾 สำรองข้อมูล
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('logs')">
+                        📋 บันทึกกิจกรรม
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="header-bar">
+                <div>
+                    <h1 class="page-title" id="pageTitle">⚡ เทอร์มินัลไซเบอร์แพนเนล</h1>
+                    <p class="page-description" id="pageDescription">ระบบควบคุมและจัดการเว็บไซต์</p>
+                </div>
+                <div class="header-actions">
+                    <button class="cyber-btn" onclick="refreshSystemStatus()">
+                        🔄 รีเฟรช
+                    </button>
+                    <button class="cyber-btn" onclick="openUserPostSystem()">
+                        🌐 ระบบผู้ใช้
+                    </button>
+                    <button class="cyber-btn danger" onclick="adminLogout()">
+                        🚪 ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+
+            <div id="section-dashboard" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-number" id="totalUsers">247</div>
+                        <div class="stat-label">ผู้ใช้ทั้งหมด</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-number" id="totalPosts">1,847</div>
+                        <div class="stat-label">โพสต์ทั้งหมด</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👍</div>
+                        <div class="stat-number" id="totalLikes">12,394</div>
+                        <div class="stat-label">การมีส่วนร่วม</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔒</div>
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">สถานะความปลอดภัย</div>
+                    </div>
+                </div>
+
+                <div class="terminal-text">
+                    <span class="blinking-cursor">สถานะระบบ: ทุกระบบทำงานปกติ</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                    <div class="cyber-form">
+                        <h3 style="color: var(--cyber-cyan); margin-bottom: 20px; font-family: 'Orbitron', monospace; text-transform: uppercase;">การดำเนินการด่วน</h3>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <button class="cyber-btn" onclick="moderatePosts()">🔍 ตรวจสอบโพสต์</button>
+                            <button class="cyber-btn" onclick="bulkAction()">⚡ จัดการหลายรายการ</button>
+                            <button class="cyber-btn" onclick="generateReport()">📊 สร้างรายงาน</button>
+                            <button class="cyber-btn" onclick="backupNow()">💾 สำรองข้อมูลฉุกเฉิน</button>
+                        </div>
+                    </div>
+                    
+                    <div class="cyber-form">
+                        <h3 style="color: var(--cyber-cyan); margin-bottom: 20px; font-family: 'Orbitron', monospace; text-transform: uppercase;">สถิติระบบ</h3>
+                        <div style="color: var(--cyber-gray); line-height: 1.6;">
+                            <div>⚡ การใช้ CPU: <span style="color: var(--cyber-green);">23%</span></div>
+                            <div>💾 หน่วยความจำ: <span style="color: var(--cyber-cyan);">67%</span></div>
+                            <div>🌐 เครือข่าย: <span style="color: var(--cyber-green);">เสถียร</span></div>
+                            <div>🔥 อุณหภูมิ: <span style="color: var(--cyber-orange);">42°C</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-users" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <button class="cyber-btn" onclick="openUserModal()">+ เพิ่มผู้ใช้</button>
+                </div>
+                
+                <table class="cyber-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>ไอดี</th>
+                            <th>ชื่อผู้ใช้</th>
+                            <th>อีเมล</th>
+                            <th>บทบาท</th>
+                            <th>สถานะ</th>
+                            <th>การดำเนินการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        </tbody>
+                </table>
+            </div>
+
+            <div id="section-posts" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <button class="cyber-btn" onclick="moderatePosts()">🔍 ตรวจสอบทั้งหมด</button>
+                </div>
+                
+                <table class="cyber-table" id="postsTable">
+                    <thead>
+                        <tr>
+                            <th>ไอดี</th>
+                            <th>ผู้เขียน</th>
+                            <th>เนื้อหา</th>
+                            <th>วันที่</th>
+                            <th>สถานะ</th>
+                            <th>การดำเนินการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="postsTableBody">
+                        </tbody>
+                </table>
+            </div>
+
+            <div id="section-analytics" class="content-section">
+                <div class="cyber-form">
+                    <h3 style="color: var(--cyber-cyan); margin-bottom: 20px; font-family: 'Orbitron', monospace; text-transform: uppercase;">แดชบอร์ดวิเคราะห์</h3>
+                    <div class="terminal-text">
+                        กำลังสร้างข้อมูลวิเคราะห์แบบเรียลไทม์...
+                    </div>
+                    <button class="cyber-btn" onclick="generateReport()">📊 สร้างรายงานละเอียด</button>
+                </div>
+            </div>
+
+            <div id="section-content" class="content-section">
+                <div class="cyber-form">
+                    <h3 style="color: var(--cyber-cyan); margin-bottom: 20px; font-family: 'Orbitron', monospace; text-transform: uppercase;">จัดการเนื้อหา</h3>
+                    <button class="cyber-btn" onclick="editWebsiteContent()">📝 แก้ไขเนื้อหาเว็บไซต์</button>
+                </div>
+            </div>
+
+            <div id="section-security" class="content-section">
+                <div class="cyber-form">
+                    <h3 style="color: var(--cyber-cyan); margin-bottom: 20px; font-family: 'Orbitron', monospace; text-transform: uppercase;">ควบคุมความปลอดภัย</h3>
+                    <div class="terminal-text">
+                        ไฟร์วอล: <span style="color: var(--cyber-green);">เปิดใช้งาน</span><br>
+                        ตรวจจับการบุกรุก: <span style="color: var(--cyber-green);">เปิดใช้งาน</span><br>
+                        สแกนครั้งล่าสุด: <span style="color: var(--cyber-cyan);">2 นาทีที่แล้ว</span>
+                    </div>
+                    <button class="cyber-btn" onclick="runSecurityScan()">🔍 เริ่มสแกนความปลอดภัย</button>
+                </div>
+            </div>
+
+            <div id="section-system" class="content-section">
+                <div class="cyber-form">
+                    <h3 style="color: var(--cyber-cyan); margin-bottom: 20px; font-family: 'Orbitron', monospace; text-transform: uppercase;">การตั้งค่าระบบ</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">ชื่อเว็บไซต์</label>
+                        <input type="text" class="form-input" id="siteName" value="ระบบไซเบอร์แพนเนล" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">อีเมลผู้ดูแล</label>
+                        <input type="email" class="form-input" id="adminEmail" value="admin@cyberpanel.com" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">จำนวนผู้ใช้สูงสุด</label>
+                        <input type="number" class="form-input" id="maxUsers" value="1000" />
+                    </div>
+                    
+                    <button class="cyber-btn" onclick="saveSystemSettings()">💾 บันทึกการตั้งค่า</button>
+                </div>
+            </div>
+
+            <div id="section-backup" class="content-section">
+                <div class="cyber-form">
+                    <h3 style="color: var(--cyber-cyan); margin-bottom: 20px; font-family: 'Orbitron', monospace; text-transform: uppercase;">คลังข้อมูล</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">ประเภทการสำรอง</label>
+                        <select class="form-input" id="backupType">
+                            <option value="full">ระบบทั้งหมด</option>
+                            <option value="database">ฐานข้อมูลเท่านั้น</option>
+                            <option value="files">ไฟล์เท่านั้น</option>
+                        </select>
+                    </div>
+                    
+                    <button class="cyber-btn" onclick="createBackup()">💾 สร้างการสำรอง</button>
+                </div>
+
+                <table class="cyber-table" id="backupTable">
+                    <thead>
+                        <tr>
+                            <th>ชื่อไฟล์</th>
+                            <th>ประเภท</th>
+                            <th>ขนาด</th>
+                            <th>วันที่</th>
+                            <th>การดำเนินการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="backupTableBody">
+                        </tbody>
+                </table>
+            </div>
+
+            <div id="section-logs" class="content-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <button class="cyber-btn" onclick="filterLogs()">🔍 กรองบันทึก</button>
+                    <button class="cyber-btn danger" onclick="clearLogs()">🗑️ ล้างทั้งหมด</button>
+                </div>
+                
+                <table class="cyber-table" id="logsTable">
+                    <thead>
+                        <tr>
+                            <th>เวลา</th>
+                            <th>ผู้ใช้</th>
+                            <th>การดำเนินการ</th>
+                            <th>รายละเอียด</th>
+                            <th>ไอพี</th>
+                            <th>สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="alert" id="alert"></div>
+
+    <script>
+        // ========== ADMIN AUTHENTICATION ==========
+        // กำหนดข้อมูลสำหรับผู้ดูแลระบบ
+        const adminCredentials = [
+            { username: 'admin', password: 'admin123', name: 'System Administrator' },
+            { username: 'cyberadmin', password: 'cyber2024', name: 'Cyber Administrator' },
+            { username: 'root', password: 'rootpass', name: 'Root User' }
+        ];
+
+        let currentAdmin = null;
+        let systemData = {
+            // ดึงข้อมูลจาก localStorage (จำลองฐานข้อมูล)
+            users: JSON.parse(localStorage.getItem('registeredUsers') || '[]'),
+            posts: JSON.parse(localStorage.getItem('systemPosts') || '[]'),
+            logs: JSON.parse(localStorage.getItem('adminLogs') || '[]'),
+            backups: JSON.parse(localStorage.getItem('backupHistory') || '[]'),
+            settings: JSON.parse(localStorage.getItem('systemSettings') || '{}')
+        };
+
+        function userLogin() {
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+
+            if (!username || !password) {
+                showAdminAlert('⚠ กรุณากรอกชื่อผู้ใช้และรหัสผ่าน', 'error');
+                return;
+            }
+
+            const admin = adminCredentials.find(a => a.username === username && a.password === password);
+
+            if (admin) {
+                currentAdmin = admin;
+                // ซ่อนหน้าล็อกอิน
+                document.getElementById('adminLogin').classList.add('hidden');
+                // แสดงหน้าแดชบอร์ด
+                document.getElementById('adminContainer').classList.add('authenticated');
+                
+                addAdminLog('Admin Login', `ผู้ดูแลระบบ ${admin.name} เข้าสู่ระบบ`, 'success');
+                loadDashboardData();
+                showAlert('⚡ เข้าสู่ระบบสำเร็จ - ยินดีต้อนรับสู่ไซเบอร์แพนเนล', 'success');
+            } else {
+                showAdminAlert('❌ ข้อมูลไม่ถูกต้อง - ไม่สามารถเข้าถึงได้', 'error');
+                addAdminLog('Failed Login', `การพยายามเข้าสู่ระบบล้มเหลว: ${username}`, 'error');
+            }
+        }
+
+        function adminLogout() {
+            if (confirm('⚠ ต้องการออกจากระบบหรือไม่?')) {
+                addAdminLog('Admin Logout', `ผู้ดูแลระบบ ${currentAdmin.name} ออกจากระบบ`, 'info');
+                currentAdmin = null;
+                document.getElementById('adminLogin').classList.remove('hidden');
+                document.getElementById('adminContainer').classList.remove('authenticated');
+                document.getElementById('adminUsername').value = '';
+                document.getElementById('adminPassword').value = '';
+                showAlert('🚪 ออกจากระบบเรียบร้อย', 'info');
+            }
+        }
+
+        // ========== DASHBOARD DATA ==========
+        function loadDashboardData() {
+            updateStatistics();
+            loadUsersTable();
+            loadPostsTable();
+            loadLogsTable();
+            loadBackupHistory();
+        }
+
+        function updateStatistics() {
+            const users = systemData.users;
+            const posts = systemData.posts;
+            
+            document.getElementById('totalUsers').textContent = users.length || '0';
+            document.getElementById('totalPosts').textContent = posts.length || '0';
+            
+            const totalLikes = posts.reduce((sum, post) => sum + (post.likes || 0), 0);
+            document.getElementById('totalLikes').textContent = totalLikes.toLocaleString();
+        }
+
+        function loadUsersTable() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            systemData.users.forEach((user, index) => {
+                const row = document.createElement('tr');
+                const statusClass = user.isActive ? 'active' : 'inactive';
+                row.innerHTML = `
+                    <td>#${String(index + 1).padStart(3, '0')}</td>
+                    <td>${user.username || user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.role || 'ผู้ใช้'}</td>
+                    <td><span class="status-badge ${statusClass}">${user.isActive ? 'ออนไลน์' : 'ออฟไลน์'}</span></td>
+                    <td>
+                        <button class="cyber-btn" style="padding: 5px 10px; margin-right: 5px; font-size: 10px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);" onclick="editUser('${user.id || index}')">✏️</button>
+                        <button class="cyber-btn danger" style="padding: 5px 10px; font-size: 10px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);" onclick="deleteUser('${user.id || index}')">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function loadPostsTable() {
+            const tbody = document.getElementById('postsTableBody');
+            tbody.innerHTML = '';
+
+            systemData.posts.slice(0, 10).forEach((post, index) => {
+                const row = document.createElement('tr');
+                const statusClass = post.isApproved ? 'active' : 'warning';
+                const content = (post.content || '').substring(0, 50) + '...';
+                row.innerHTML = `
+                    <td>#${String(index + 1).padStart(3, '0')}</td>
+                    <td>${post.author || post.authorName || 'ไม่ระบุ'}</td>
+                    <td>${content}</td>
+                    <td>${new Date(post.timestamp || post.createdAt).toLocaleDateString('th-TH')}</td>
+                    <td><span class="status-badge ${statusClass}">${post.isApproved ? 'อนุมัติ' : 'รอตรวจสอบ'}</span></td>
+                    <td>
+                        <button class="cyber-btn" style="padding: 5px 10px; margin-right: 5px; font-size: 10px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);" onclick="moderatePost('${post.id}')">👁️</button>
+                        <button class="cyber-btn danger" style="padding: 5px 10px; font-size: 10px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);" onclick="deletePost('${post.id}')">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function loadLogsTable() {
+            const tbody = document.getElementById('logsTableBody');
+            tbody.innerHTML = '';
+
+            systemData.logs.slice(0, 20).forEach(log => {
+                const row = document.createElement('tr');
+                const statusClass = log.status === 'success' ? 'active' : 
+                                   log.status === 'warning' ? 'warning' : 
+                                   log.status === 'error' ? 'error' : 'inactive';
+                row.innerHTML = `
+                    <td>${new Date(log.timestamp).toLocaleString('th-TH')}</td>
+                    <td>${log.user}</td>
+                    <td>${log.action}</td>
+                    <td>${log.details}</td>
+                    <td>127.0.0.1</td>
+                    <td><span class="status-badge ${statusClass}">${log.status.toUpperCase()}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function loadBackupHistory() {
+            const tbody = document.getElementById('backupTableBody');
+            tbody.innerHTML = '';
+
+            systemData.backups.forEach(backup => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${backup.filename}</td>
+                    <td>${backup.type}</td>
+                    <td>${backup.size}</td>
+                    <td>${new Date(backup.createdAt).toLocaleDateString('th-TH')}</td>
+                    <td>
+                        <button class="cyber-btn" style="padding: 5px 10px; margin-right: 5px; font-size: 10px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);" onclick="downloadBackup('${backup.id}')">📥</button>
+                        <button class="cyber-btn danger" style="padding: 5px 10px; font-size: 10px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);" onclick="deleteBackup('${backup.id}')">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ========== NAVIGATION ==========
+        function showSection(section) {
+            document.querySelectorAll('[id^="section-"]').forEach(sec => {
+                sec.classList.remove('active');
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // หา element ที่ถูกคลิก (ในกรณีที่เรียกจาก DOM event)
+            if (event && event.target) {
+                // หา element ที่เป็น nav-link จริงๆ
+                const clickedLink = event.target.closest('.nav-link');
+                if (clickedLink) {
+                    clickedLink.classList.add('active');
+                }
+            }
+
+            document.getElementById('section-' + section).classList.add('active');
+            updateHeader(section);
+        }
+
+        function updateHeader(section) {
+            const titles = {
+                dashboard: { title: '⚡ เทอร์มินัลไซเบอร์แพนเนล', desc: 'ระบบควบคุมและจัดการเว็บไซต์' },
+                users: { title: '👥 จัดการผู้ใช้', desc: 'การจัดการและตรวจสอบผู้ใช้งาน' },
+                posts: { title: '📝 จัดการโพสต์', desc: 'การควบคุมและดูแลเนื้อหา' },
+                analytics: { title: '📈 วิเคราะห์ข้อมูล', desc: 'สถิติและการวิเคราะห์ระบบ' },
+                content: { title: '📄 จัดการเนื้อหา', desc: 'การจัดการเนื้อหาเว็บไซต์' },
+                security: { title: '🔒 ระบบความปลอดภัย', desc: 'การตรวจสอบและรักษาความปลอดภัย' },
+                system: { title: '⚙️ การตั้งค่า', desc: 'การกำหนดค่าการทำงานของระบบ' },
+                backup: { title: '💾 สำรองข้อมูล', desc: 'การจัดการการสำรองและกู้คืนข้อมูล' },
+                logs: { title: '📋 บันทึกกิจกรรม', desc: 'การติดตามการใช้งานระบบ' }
+            };
+
+            if (titles[section]) {
+                document.getElementById('pageTitle').textContent = titles[section].title;
+                document.getElementById('pageDescription').textContent = titles[section].desc;
+            }
+        }
+
+        // ========== UTILITY FUNCTIONS ==========
+        function addAdminLog(action, details, status) {
+            const log = {
+                id: Date.now(),
+                action: action,
+                details: details,
+                timestamp: new Date().toISOString(),
+                user: currentAdmin ? currentAdmin.name : 'SYSTEM',
+                status: status || 'info'
+            };
+
+            systemData.logs.unshift(log);
+            if (systemData.logs.length > 200) {
+                systemData.logs = systemData.logs.slice(0, 200);
+            }
+
+            localStorage.setItem('adminLogs', JSON.stringify(systemData.logs));
+        }
+
+        function showAdminAlert(message, type) {
+            const alert = document.getElementById('loginAlert');
+            alert.textContent = message;
+            alert.className = `login-alert ${type} show`;
+
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 4000);
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type} active`;
+            
+            setTimeout(() => {
+                alert.classList.remove('active');
+            }, 3000);
+        }
+
+        // ========== ADMIN FUNCTIONS ==========
+        function refreshSystemStatus() {
+            addAdminLog('System Status', 'อัปเดตสถานะระบบ', 'success');
+            showAlert('⚡ อัปเดตสถานะระบบเรียบร้อย', 'success');
+            loadDashboardData();
+        }
+
+        function openUserPostSystem() {
+            addAdminLog('Access User System', 'เข้าสู่ระบบผู้ใช้', 'info');
+            // จำเป็นต้องมีไฟล์ cyberpunk-user-system.html อยู่ในโฟลเดอร์เดียวกัน
+            window.open('cyberpunk-user-system.html', '_blank');
+        }
+
+        function backupNow() {
+            const backup = {
+                id: Date.now(),
+                filename: `cyberpanel_backup_${new Date().toISOString().slice(0,10)}.zip`,
+                type: 'สำรองข้อมูลฉุกเฉิน',
+                size: Math.floor(Math.random() * 100 + 50) + 'MB',
+                createdAt: new Date().toISOString()
+            };
+
+            systemData.backups.unshift(backup);
+            localStorage.setItem('backupHistory', JSON.stringify(systemData.backups));
+            
+            addAdminLog('Emergency Backup', 'สร้างสำรองข้อมูลฉุกเฉิน', 'success');
+            loadBackupHistory();
+            showAlert('💾 สร้างสำรองข้อมูลฉุกเฉินสำเร็จ', 'success');
+        }
+
+        function editUser(userId) {
+            addAdminLog('Edit User', `เริ่มแก้ไขผู้ใช้: ไอดี ${userId}`, 'info');
+            showAlert('👤 เปิดตัวแก้ไขผู้ใช้...', 'info');
+        }
+
+        function deleteUser(userId) {
+            if (confirm('⚠ ต้องการลบผู้ใช้นี้ออกจากระบบหรือไม่?')) {
+                systemData.users = systemData.users.filter((u, i) => (u.id || i) !== userId);
+                localStorage.setItem('registeredUsers', JSON.stringify(systemData.users));
+                
+                addAdminLog('Delete User', `ลบผู้ใช้: ไอดี ${userId}`, 'warning');
+                loadUsersTable();
+                updateStatistics();
+                showAlert('🗑️ ลบผู้ใช้ออกจากระบบเรียบร้อย', 'success');
+            }
+        }
+
+        function moderatePost(postId) {
+            addAdminLog('Moderate Post', `ตรวจสอบโพสต์: ไอดี ${postId}`, 'info');
+            showAlert('👁️ เปิดตัวตรวจสอบโพสต์...', 'info');
+        }
+
+        function deletePost(postId) {
+            if (confirm('⚠ ต้องการลบโพสต์นี้ออกจากระบบหรือไม่?')) {
+                systemData.posts = systemData.posts.filter(p => p.id !== postId);
+                localStorage.setItem('systemPosts', JSON.stringify(systemData.posts));
+                
+                addAdminLog('Delete Post', `ลบโพสต์: ไอดี ${postId}`, 'warning');
+                loadPostsTable();
+                updateStatistics();
+                showAlert('🗑️ ลบโพสต์ออกจากระบบเรียบร้อย', 'success');
+            }
+        }
+
+        function runSecurityScan() {
+            addAdminLog('Security Scan', 'เริ่มการสแกนความปลอดภัย', 'info');
+            showAlert('🔍 กำลังทำการสแกนความปลอดภัย...', 'info');
+            setTimeout(() => {
+                showAlert('✅ การสแกนความปลอดภัยเสร็จสิ้น - ไม่พบภัยคุกคาม', 'success');
+                addAdminLog('Security Scan', 'การสแกนความปลอดภัยเสร็จสิ้น - ปลอดภัย', 'success');
+            }, 3000);
+        }
+
+        function createBackup() {
+            const type = document.getElementById('backupType').value;
+            const backup = {
+                id: Date.now(),
+                filename: `cyberpanel_${type}_${new Date().toISOString().slice(0,10)}.zip`,
+                type: type.toUpperCase(),
+                size: Math.floor(Math.random() * 100 + 20) + 'MB',
+                createdAt: new Date().toISOString()
+            };
+
+            systemData.backups.unshift(backup);
+            localStorage.setItem('backupHistory', JSON.stringify(systemData.backups));
+            
+            addAdminLog('Create Backup', `สร้างสำรองข้อมูล: ${type.toUpperCase()}`, 'success');
+            loadBackupHistory();
+            showAlert('💾 สร้างสำรองข้อมูลเรียบร้อย', 'success');
+        }
+
+        function saveSystemSettings() {
+            const settings = {
+                siteName: document.getElementById('siteName').value,
+                adminEmail: document.getElementById('adminEmail').value,
+                maxUsers: document.getElementById('maxUsers').value
+            };
+
+            systemData.settings = settings;
+            localStorage.setItem('systemSettings', JSON.stringify(systemData.settings));
+            
+            addAdminLog('Save Settings', 'บันทึกการตั้งค่าระบบ', 'success');
+            showAlert('⚙️ บันทึกการตั้งค่าเรียบร้อย', 'success');
+        }
+
+        // Placeholder functions
+        function openUserModal() { showAlert('👤 กำลังเปิดโมดูลสร้างผู้ใช้...', 'info'); }
+        function moderatePosts() { showAlert('🔍 กำลังเปิดระบบตรวจสอบโพสต์...', 'info'); }
+        function bulkAction() { showAlert('⚡ กำลังเปิดระบบจัดการหลายรายการ...', 'info'); }
+        function generateReport() { showAlert('📊 กำลังสร้างรายงานระบบ...', 'info'); }
+        function editWebsiteContent() { showAlert('📝 กำลังเปิดตัวแก้ไขเนื้อหา...', 'info'); }
+        function filterLogs() { showAlert('🔍 กำลังเปิดตัวกรองบันทึก...', 'info'); }
+        function clearLogs() { 
+            if (confirm('⚠ ต้องการล้างบันทึกทั้งหมดหรือไม่?')) {
+                systemData.logs = [];
+                localStorage.setItem('adminLogs', JSON.stringify(systemData.logs));
+                loadLogsTable();
+                showAlert('🗑️ ล้างบันทึกทั้งหมดเรียบร้อย', 'success');
+            }
+        }
+        function downloadBackup(id) { showAlert('📥 กำลังเริ่มดาวน์โหลด...', 'info'); }
+        function deleteBackup(id) { 
+            if (confirm('⚠ ต้องการลบไฟล์สำรองข้อมูลนี้หรือไม่?')) {
+                systemData.backups = systemData.backups.filter(b => b.id !== id);
+                localStorage.setItem('backupHistory', JSON.stringify(systemData.backups));
+                loadBackupHistory();
+                showAlert('🗑️ ลบไฟล์สำรองข้อมูลเรียบร้อย', 'success');
+            }
+        }
+
+        // ========== KEYBOARD SHORTCUTS ==========
+        document.addEventListener('keydown', function(e) {
+            // Enter key on login
+            if (document.getElementById('adminLogin') && document.getElementById('adminLogin').style.display !== 'none') {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // ป้องกันการส่งฟอร์มมาตรฐาน
+                    userLogin();
+                }
+            }
+            
+            // ESC key to logout
+            if (e.key === 'Escape' && currentAdmin) {
+                adminLogout();
+            }
+        });
+
+        // Initialize
+        if (systemData.logs.length === 0) {
+            addAdminLog('System Start', 'ระบบไซเบอร์แพนเนลเริ่มทำงาน', 'success');
+        }
+
+        // ตรวจสอบสถานะการแสดงผลเมื่อโหลดหน้า
+        document.addEventListener('DOMContentLoaded', () => {
+            // ถ้าไม่มี currentAdmin (ไม่ได้ล็อกอิน) ให้แน่ใจว่าแสดงหน้าล็อกอิน
+            if (!currentAdmin) {
+                document.getElementById('adminLogin').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
